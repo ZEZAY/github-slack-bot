@@ -1,5 +1,6 @@
 import express from "express"
 import { requireEnv } from "./utils/env";
+import { postUpdateNotifyMessage } from "./slack-messaging";
 
 export const repo = {
     owner: requireEnv('GITHUB_REPO_OWNER'),
@@ -29,9 +30,8 @@ ghRouter.post("/payload", (req, res) => {
         req.body.repository.name === repo.name
     ) {
         const tag = ref.split('/')[2];
-        console.log(tag);
-
-        // todo: send notify to slack
+        // send notify to slack
+        postUpdateNotifyMessage(tag);
     }
 
     return res.sendStatus(200)

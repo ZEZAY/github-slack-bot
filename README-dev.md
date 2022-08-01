@@ -46,3 +46,9 @@ there are 2 possible ways to add webhook to a repository:
 2. create github app, App Settings > General > Webhook
 
 about events and payloads: [here!](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads)
+
+## Slack App
+
+docs for message management: [here!](https://api.slack.com/messaging)
+
+there are many ways to send messages: [here!](https://api.slack.com/messaging/sending#sending_methods)

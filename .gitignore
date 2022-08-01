@@ -465,3 +465,4 @@ FodyWeavers.xsd
 
 ### Custom ###
 sample-*
+.env
