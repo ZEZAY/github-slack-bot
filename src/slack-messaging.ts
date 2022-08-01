@@ -1,6 +1,6 @@
 import { requireEnv } from "./utils/env";
 import { MessageAttachment } from '@slack/bolt';
-import { getUpdatedAttachment } from './message';
+import { updatedAttachment } from './message';
 
 const { WebClient, LogLevel } = require("@slack/web-api");
 const client = new WebClient(requireEnv('SLACK_BOT_TOKEN'), {
@@ -16,6 +16,6 @@ export async function postMessage(title: string, attachments: MessageAttachment[
 }
 
 export async function postUpdateNotifyMessage(tag: string): Promise<void> {
-    const [title, attachment] = await getUpdatedAttachment(tag)
+    const [title, attachment] = await updatedAttachment(tag)
     await postMessage(title, attachment);
 }

@@ -52,3 +52,9 @@ about events and payloads: [here!](https://docs.github.com/en/developers/webhook
 docs for message management: [here!](https://api.slack.com/messaging)
 
 there are many ways to send messages: [here!](https://api.slack.com/messaging/sending#sending_methods)
+
+## Github App
+
+to take action with github repository/workflows using `@octokit` lib
+
+docs: [here!](https://octokit.github.io/rest.js/v18#repos)
