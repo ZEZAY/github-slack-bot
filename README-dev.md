@@ -35,3 +35,14 @@ app.listen(3000, () => {
   console.log("app is running");
 });
 ```
+
+## Github Webhooks
+
+create `post` endpoint for github webhook, then add it to the target repository
+
+there are 2 possible ways to add webhook to a repository:
+
+1. go to target repo, Repo Settings > Code and automation > Webhooks
+2. create github app, App Settings > General > Webhook
+
+about events and payloads: [here!](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads)
