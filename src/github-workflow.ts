@@ -38,8 +38,8 @@ export async function findWorkflowsChanged(base: string, head: string): Promise<
             service.replace('-', '\\/(cmd|config|domain\\/usecase)\\/'),
         );
 
-        return filesChanged.find((v) => {
-            return v.match(re) != undefined || v.match(reSlamm) != undefined;
+        return filesChanged.find((w) => {
+            return w.match(re) != undefined || w.match(reSlamm) != undefined;
         });
     });
     return workflowsChanged;
@@ -51,7 +51,7 @@ export async function getTagBefore(tag: string): Promise<string> {
         repo: repo.name,
     });
     const tags = result.data.map((v) => v.name);
-    const reverse = tags.reverse();
+    const reverse = [...tags].reverse();
 
     const indexOf = reverse.findIndex((v) => v === tag);
     if (indexOf <= 0) {

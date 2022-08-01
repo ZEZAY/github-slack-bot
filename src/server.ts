@@ -10,7 +10,7 @@ export const app = express();
 
 app.use(express.json())
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
     return res.send("hello world");
 });
 
