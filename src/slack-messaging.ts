@@ -1,6 +1,6 @@
 import { requireEnv } from "./utils/env";
 import { MessageAttachment } from '@slack/bolt';
-import { updatedAttachment, approveOrDenyAttachment, workflowStatusAttachment } from './message';
+import { updatedAttachment, approveOrDenyAttachment, workflowStatusAttachment, mergePRAttachment } from './message';
 
 const { WebClient, LogLevel } = require("@slack/web-api");
 const client = new WebClient(requireEnv('SLACK_BOT_TOKEN'), {
@@ -59,4 +59,9 @@ export async function deleteMessage(ts: string, channel: string): Promise<void> 
         channel: channelId,
         ts: messageId,
     });
+}
+
+export async function postMergePRMessage(pr: any): Promise<void> {
+    const [title, attachment] = await mergePRAttachment(pr);
+    await postMessage(title, attachment);
 }

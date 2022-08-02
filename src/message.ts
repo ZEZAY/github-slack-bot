@@ -1,5 +1,5 @@
 import { KnownBlock, MessageAttachment, Option } from '@slack/bolt';
-import { findWorkflowsChanged, getTagBefore as findTagBefore, listWorkflow } from './github-workflow';
+import { findWorkflowsChanged, getTagBefore, listWorkflow, mergePR } from './github-workflow';
 import { approvers } from './permission';
 import { repo } from './server';
 import { encodeDeployActionValue } from './utils/action-value';
@@ -12,7 +12,7 @@ export async function updatedAttachment(tag: string): Promise<[string, MessageAt
     workflows.sort((a, b) => (a.path > b.path ? 1 : -1));
 
     const head = tag;
-    const base = await findTagBefore(tag);
+    const base = await getTagBefore(tag);
     const recentlyChanged = await findWorkflowsChanged(base, head);
     recentlyChanged.forEach((w) => {
         workflows = workflows.filter((workflow) => workflow.path !== w.path);
@@ -317,6 +317,74 @@ export async function workflowStatusAttachment(
     const attachment: MessageAttachment[] = [
         {
             color: color,
+            blocks: blocks,
+        },
+    ];
+    return [title, attachment];
+}
+
+export async function mergePRAttachment(
+    pr: any,
+): Promise<[string, MessageAttachment[]]> {
+    const [result, status] = await mergePR(pr.number);
+    let title: string;
+    if (status == 200) {
+        title = 'Merge: :tada: Success\n'.concat(result.message);
+    } else {
+        title = 'Merge: :construction: Failure '.concat(
+            '(',
+            status,
+            ')\n',
+            result.message,
+        );
+    }
+
+    const blocks: KnownBlock[] = [
+        {
+            type: 'section',
+            fields: [
+                {
+                    type: 'mrkdwn',
+                    text: `*Title:*\n${pr.title}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Number:*\n${pr.number}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Head:*\n${pr.head.ref}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Base:*\n${pr.base.ref}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Create Time:*\n${pr.created_at}`,
+                },
+            ],
+        },
+        {
+            type: 'actions',
+            elements: [
+                {
+                    type: 'button',
+                    text: {
+                        type: 'plain_text',
+                        text: 'Click to view pull request',
+                        emoji: true,
+                    },
+                    value: `${pr.number}`,
+                    url: pr.html_url,
+                    action_id: 'check-pull-request',
+                },
+            ],
+        },
+    ];
+    const attachment: MessageAttachment[] = [
+        {
+            color: '#9647b3',
             blocks: blocks,
         },
     ];

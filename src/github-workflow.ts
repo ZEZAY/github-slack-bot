@@ -1,7 +1,7 @@
 import { Octokit } from 'octokit';
 import { createAppAuth } from '@octokit/auth-app';
 import { components } from '@octokit/openapi-types';
-import { repo } from './server';
+import { repo, targetRepo } from './server';
 import { requireEnv } from './utils/env';
 import { delay } from './utils/async';
 
@@ -111,4 +111,20 @@ export async function deployWorkflow(workflowId: string, branchOrTag: string): P
         ref: branchOrTag,
     });
     return result.status;
+}
+
+export async function mergePR(pullNumber: number): Promise<any> {
+    try {
+        const result = await octokit.rest.pulls.merge({
+            owner: repo.owner,
+            repo: targetRepo.name,
+            pull_number: pullNumber,
+        });
+        return [result.data, result.status];
+    } catch (err) {
+        console.log(err);
+        // data -> err msg
+        // status -> not 200
+        return [err, 0];
+    }
 }
