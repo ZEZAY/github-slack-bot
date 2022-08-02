@@ -119,3 +119,11 @@ boltApp.action('deny', async ({ body, ack }) => {
     const denier = body.user.id;
     await postApproveOrDenyMessage(workflowId, ref, WorkflowStatus.DENY, denier, requester)
 });
+
+boltApp.action('check-workflow-run', async ({ ack }) => {
+    await ack();
+});
+
+boltApp.action('check-pull-request', async ({ ack }) => {
+    await ack();
+});
