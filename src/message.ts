@@ -1,7 +1,9 @@
 import { KnownBlock, MessageAttachment, Option } from '@slack/bolt';
 import { findWorkflowsChanged, getTagBefore as findTagBefore, listWorkflow } from './github-workflow';
+import { approvers } from './permission';
 import { repo } from './server';
 import { encodeDeployActionValue } from './utils/action-value';
+import { WorkflowStatus } from './utils/enums';
 
 export async function updatedAttachment(tag: string): Promise<[string, MessageAttachment[]]> {
     const title = ':mega:  New version available '.concat(tag)
@@ -127,4 +129,104 @@ function workflowSelectSection(
         },
     };
     return block;
+}
+
+export async function approveOrDenyAttachment(
+    workflowId: string,
+    ref: string,
+    status: string,
+    approver: string,
+    requester: string,
+): Promise<[string, MessageAttachment[]]> {
+    let title;
+    let textStatus;
+    let textStatus_val;
+    switch (status) {
+        case WorkflowStatus.PENDING:
+            title = ':rocket:  You have a new request:\n';
+            for (const ap of approvers) {
+                title = title.concat('<@', ap, '>');
+            }
+            textStatus = 'Status';
+            textStatus_val = WorkflowStatus.PENDING;
+            break;
+        case WorkflowStatus.DENY:
+            title = 'Approval: :no_entry:  '.concat(workflowId, ' has been ', status);
+            textStatus = 'Denied by';
+            textStatus_val = '<@'.concat(approver, '>');
+            break;
+        default:
+            title = 'Approval: :ok:   '.concat(workflowId, ' has been ', status);
+            textStatus = 'Approved by';
+            textStatus_val = '<@'.concat(approver, '>');
+    }
+    const blocks: KnownBlock[] = [
+        {
+            type: 'section',
+            fields: [
+                {
+                    type: 'mrkdwn',
+                    text: `*Workflow:*\n${workflowId}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Branch:*\n${ref}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*${textStatus} :*\n${textStatus_val}`,
+                },
+                {
+                    type: 'mrkdwn',
+                    text: `*Requested by:*\n<@${requester}>`,
+                },
+            ],
+        },
+    ];
+
+    if (status == WorkflowStatus.PENDING) {
+        blocks.push({
+            type: 'actions',
+            elements: [
+                {
+                    type: 'button',
+                    text: {
+                        type: 'plain_text',
+                        emoji: true,
+                        text: 'Approve',
+                    },
+                    action_id: 'approve',
+                    style: 'primary',
+                    value: encodeDeployActionValue({
+                        workflowId,
+                        ref,
+                        requester,
+                    }),
+                },
+                {
+                    type: 'button',
+                    text: {
+                        type: 'plain_text',
+                        emoji: true,
+                        text: 'Deny',
+                    },
+                    action_id: 'deny',
+                    style: 'danger',
+                    value: encodeDeployActionValue({
+                        workflowId,
+                        ref,
+                        requester,
+                    }),
+                },
+            ],
+        });
+    }
+
+    const attachment: MessageAttachment[] = [
+        {
+            color: '',
+            blocks: blocks,
+        },
+    ];
+    return [title, attachment];
 }

@@ -47,7 +47,7 @@ there are 2 possible ways to add webhook to a repository:
 
 about events and payloads: [here!](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads)
 
-## Slack App
+## Slack App - part 1
 
 docs for message management: [here!](https://api.slack.com/messaging)
 
@@ -58,3 +58,12 @@ there are many ways to send messages: [here!](https://api.slack.com/messaging/se
 to take action with github repository/workflows using `@octokit` lib
 
 docs: [here!](https://octokit.github.io/rest.js/v18#repos)
+
+## Slack App - part 2
+
+to react to slack actions using `@slack/bolt` lib
+
+1. create `post` endpoint for slack webhook
+2. add it to slack app, App Features > Interactivity & Shortcuts > Interactivity > Request URL
+
+docs: [here!](https://slack.dev/bolt-js/tutorial/getting-started-http#setting-up-your-project)

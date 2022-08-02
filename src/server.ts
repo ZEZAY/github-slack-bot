@@ -1,6 +1,7 @@
 import express from "express"
 import { requireEnv } from "./utils/env";
 import { postUpdateNotifyMessage } from "./slack-messaging";
+import { receiver } from "./slack-server";
 
 export const repo = {
     owner: requireEnv('GITHUB_REPO_OWNER'),
@@ -13,6 +14,9 @@ app.use(express.json())
 app.get("/", (_req, res) => {
     return res.send("hello world");
 });
+
+// * listen to slack actions
+app.use('/', receiver.router);
 
 const ghRouter = express.Router();
 ghRouter.use(express.json());
