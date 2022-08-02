@@ -3,6 +3,7 @@ import { createAppAuth } from '@octokit/auth-app';
 import { components } from '@octokit/openapi-types';
 import { repo } from './server';
 import { requireEnv } from './utils/env';
+import { delay } from './utils/async';
 
 const octokit = new Octokit({
     authStrategy: createAppAuth,
@@ -67,4 +68,37 @@ export async function getFilesChanged(base: string, head: string): Promise<strin
         basehead: `${base}...${head}`,
     });
     return result.data.files?.map((v) => v.filename) ?? [];
+}
+
+export async function getLatestRunIdFor(workflowId: string, branchOrTag: string): Promise<number> {
+    for (let i = 0; i < 100; i++) {
+        const result = await octokit.rest.actions.listWorkflowRuns({
+            owner: repo.owner,
+            repo: repo.name,
+            workflow_id: workflowId,
+            branch: branchOrTag,
+        });
+        const workflowRuns = result.data.workflow_runs;
+
+        if (workflowRuns.length === 0 || workflowRuns[0].status === 'completed') {
+            await delay(200);
+            continue;
+        }
+
+        const latestRun = workflowRuns[0];
+        return latestRun.id;
+    }
+    // timeout
+    throw new Error(`no recently run for ${workflowId} ${branchOrTag}`);
+}
+
+export async function checkWorkflowStatus(runId: number): Promise<any> {
+    const result = await octokit.rest.actions.getWorkflowRun({
+        owner: repo.owner,
+        repo: repo.name,
+        run_id: runId,
+    });
+
+    const run = result.data;
+    return [run.status, run.conclusion, run.created_at, run.updated_at];
 }
