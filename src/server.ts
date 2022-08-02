@@ -1,7 +1,8 @@
 import express from "express"
 import { requireEnv } from "./utils/env";
-import { postMergePRMessage, postUpdateNotifyMessage } from "./slack-messaging";
+import { postApproveOrDenyMessage, postMergePRMessage, postUpdateNotifyMessage } from "./slack-messaging";
 import { receiver } from "./slack-server";
+import { WorkflowStatus } from "./utils/enums";
 
 export const repo = {
     owner: requireEnv('GITHUB_REPO_OWNER'),
@@ -12,7 +13,7 @@ export const targetRepo = {
 };
 export const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 app.get("/", (_req, res) => {
     return res.send("hello world");
@@ -65,3 +66,18 @@ ghRouter.post("/payload", async (req, res) => {
 });
 
 app.use('/github', ghRouter);
+
+const cliRouter = express.Router();
+cliRouter.use(express.json());
+cliRouter.use(express.urlencoded({ extended: true }));
+
+cliRouter.post('/trigger', async (req, res) => {
+    const ref = req.body.ref;
+    const workflowId = req.body.workflowId;
+
+    // hardcoded requester
+    await postApproveOrDenyMessage(workflowId, ref, WorkflowStatus.PENDING, '', requireEnv('SLACK_APPROVER'))
+    return res.sendStatus(200);
+});
+
+app.use('/cli', cliRouter);
