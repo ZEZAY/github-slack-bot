@@ -1,5 +1,5 @@
 import { App, ExpressReceiver } from '@slack/bolt';
-import { checkWorkflowStatus, getLatestRunIdFor } from './github-workflow';
+import { checkWorkflowStatus, deployWorkflow, getLatestRunIdFor } from './github-workflow';
 import { checkPermission } from './permission';
 import { deleteMessage, postApproveOrDenyMessage, postWorkflowStatusMessage } from './slack-messaging';
 import { decodeDeployActionValue, decodeRequestActionValue } from './utils/action-value';
@@ -65,7 +65,8 @@ boltApp.action('approve', async ({ body, ack, say }) => {
         const { workflowId, ref, requester } = decodeRequestActionValue(action.value);
         await postApproveOrDenyMessage(workflowId, ref, WorkflowStatus.APPROVE, approver, requester)
 
-        // TODO: deploy
+        // deploy
+        await deployWorkflow(workflowId, ref);
 
         let status: any = '';
         let conclusion: any;

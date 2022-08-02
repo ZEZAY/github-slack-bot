@@ -102,3 +102,13 @@ export async function checkWorkflowStatus(runId: number): Promise<any> {
     const run = result.data;
     return [run.status, run.conclusion, run.created_at, run.updated_at];
 }
+
+export async function deployWorkflow(workflowId: string, branchOrTag: string): Promise<number> {
+    const result = await octokit.rest.actions.createWorkflowDispatch({
+        owner: repo.owner,
+        repo: repo.name,
+        workflow_id: workflowId,
+        ref: branchOrTag,
+    });
+    return result.status;
+}
