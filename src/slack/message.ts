@@ -1,9 +1,9 @@
 import { KnownBlock, MessageAttachment, Option } from '@slack/bolt';
-import { findWorkflowsChanged, getTagBefore, listWorkflow, mergePR } from './github-workflow';
+import { findWorkflowsChanged, getTagBefore, listWorkflow, mergePR } from '../githubaction/workflow';
 import { approvers } from './permission';
-import { repo } from './server';
-import { encodeDeployActionValue } from './utils/action-value';
-import { WorkflowStatus } from './utils/enums';
+import { repo } from '../server';
+import { encodeDeployActionValue } from '../githubaction/actionvalue';
+import { WorkflowStatus } from '../githubaction/enums';
 
 export async function updatedAttachment(tag: string): Promise<[string, MessageAttachment[]]> {
     const title = ':mega: New version available '.concat(tag)

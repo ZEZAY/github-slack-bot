@@ -1,9 +1,9 @@
 import { Octokit } from 'octokit';
 import { createAppAuth } from '@octokit/auth-app';
 import { components } from '@octokit/openapi-types';
-import { repo, targetRepo } from './server';
-import { requireEnv } from './utils/env';
-import { delay } from './utils/async';
+import { repo, targetRepo } from '../server';
+import { requireEnv } from '../utils/env';
+import { delay } from '../utils/async';
 
 const octokit = new Octokit({
     authStrategy: createAppAuth,

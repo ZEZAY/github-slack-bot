@@ -1,8 +1,8 @@
 import express from "express"
 import { requireEnv } from "./utils/env";
-import { postApproveOrDenyMessage, postMergePRMessage, postUpdateNotifyMessage } from "./slack-messaging";
-import { receiver } from "./slack-server";
-import { WorkflowStatus } from "./utils/enums";
+import { postApproveOrDenyMessage, postMergePRMessage, postUpdateNotifyMessage } from "./slack/web-client";
+import { receiver } from "./slack/interactive";
+import { WorkflowStatus } from "./githubaction/enums";
 
 export const repo = {
     owner: requireEnv('GITHUB_REPO_OWNER'),

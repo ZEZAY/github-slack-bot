@@ -1,4 +1,4 @@
-import { requireEnv } from './utils/env';
+import { requireEnv } from '../utils/env';
 
 export const approvers: string[] = requireEnv('SLACK_APPROVER').split(',');
 
